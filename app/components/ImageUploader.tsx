@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
-import { Copy, Download, Check, X, Upload } from 'lucide-react';
+import { Copy, Download, Check, X, Upload, Sparkles } from 'lucide-react';
 
 export default function ImageUploader() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -10,6 +10,7 @@ export default function ImageUploader() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'success' | 'failed'>('idle');
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -98,6 +99,7 @@ export default function ImageUploader() {
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setIsDragOver(false);
     const file = event.dataTransfer.files[0];
     if (!file) return;
 
@@ -116,6 +118,12 @@ export default function ImageUploader() {
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragOver(false);
   };
 
   const clearImages = () => {
@@ -247,149 +255,181 @@ export default function ImageUploader() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <canvas ref={canvasRef} className="hidden" />
-      
-      {!uploadedImage ? (
-        <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-gray-400 transition-colors cursor-pointer"
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <div className="space-y-6">
-            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-              <Upload className="w-8 h-8 text-gray-400" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Upload Image to Generate "I'm Washed" Meme
-              </h2>
-              <p className="text-lg text-gray-600 mb-4">
-                Click to select or drag and drop an image
-              </p>
-              <p className="text-sm text-gray-500">
-                Supports JPG, PNG, GIF and other image formats
-              </p>
-            </div>
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-        </div>
-      ) : (
-        <div className="space-y-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Original Image */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-900">Original Image</h3>
-              <div className="relative">
-                <Image
-                  src={uploadedImage}
-                  alt="Original uploaded image"
-                  width={400}
-                  height={300}
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-              </div>
-            </div>
-
-            {/* Processed Image */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-900">I'm Washed Version</h3>
-              <div className="relative">
-                {isProcessing ? (
-                  <div className="w-full h-64 bg-gray-100 rounded-lg shadow-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                      <p className="text-gray-600">Generating meme...</p>
-                    </div>
-                  </div>
-                ) : processedImage ? (
-                  <Image
-                    src={processedImage}
-                    alt="I'm washed meme"
-                    width={400}
-                    height={300}
-                    className="w-full h-auto rounded-lg shadow-lg"
-                  />
-                ) : null}
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-4 justify-center">
-            <button
+    <div className="min-h-screen py-8 px-4">
+      <div className="w-full max-w-6xl mx-auto">
+        <canvas ref={canvasRef} className="hidden" />
+        
+        {!uploadedImage ? (
+          <div className="max-w-2xl mx-auto">
+            <div
+              className={`relative border-2 border-dashed rounded-2xl p-16 text-center transition-all duration-300 cursor-pointer group ${
+                isDragOver 
+                  ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 scale-[1.02] shadow-xl' 
+                  : 'border-gray-300 bg-white/50 hover:border-indigo-400 hover:bg-gradient-to-br hover:from-indigo-50 hover:to-purple-50 hover:scale-[1.01] hover:shadow-lg'
+              }`}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
               onClick={() => fileInputRef.current?.click()}
-              className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium"
             >
-              Upload New Image
-            </button>
-            {processedImage && (
-              <>
-                {isDesktop && (
-                  <button
-                    onClick={copyImage}
-                    disabled={copyStatus === 'copying'}
-                    className={`px-6 py-3 rounded-lg transition-colors font-medium flex items-center gap-2 ${
-                      copyStatus === 'copying' 
-                        ? 'bg-gray-400 text-white cursor-not-allowed'
-                        : copyStatus === 'success'
-                        ? 'bg-green-500 text-white hover:bg-green-600'
-                        : copyStatus === 'failed'
-                        ? 'bg-red-500 text-white hover:bg-red-600'
-                        : 'bg-purple-500 text-white hover:bg-purple-600'
-                    }`}
-                  >
-                    {copyStatus === 'copying' 
-                      ? <Copy className="w-4 h-4 animate-pulse" />
-                      : copyStatus === 'success'
-                      ? <Check className="w-4 h-4" />
-                      : copyStatus === 'failed'
-                      ? <X className="w-4 h-4" />
-                      : <Copy className="w-4 h-4" />
-                    }
-                    {copyStatus === 'copying' 
-                      ? 'Copying...' 
-                      : copyStatus === 'success'
-                      ? 'Copied!'
-                      : copyStatus === 'failed'
-                      ? 'Copy Failed'
-                      : 'Copy Image'
-                    }
-                  </button>
-                )}
-                <button
-                  onClick={downloadImage}
-                  className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Download Image
-                </button>
-              </>
-            )}
-            <button
-              onClick={clearImages}
-              className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors font-medium"
-            >
-              Clear All
-            </button>
+              <div className="space-y-8">
+                <div className="flex justify-center items-center gap-3 mb-6">
+                  <span className="text-4xl">🫧</span>
+                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    I'm Washed
+                  </h1>
+                  <span className="text-4xl">🫧</span>
+                </div>
+                <div className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  isDragOver 
+                    ? 'bg-gradient-to-br from-indigo-100 to-purple-100 scale-110' 
+                    : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-indigo-100 group-hover:to-purple-100 group-hover:scale-110'
+                }`}>
+                  <Upload className={`w-10 h-10 transition-colors duration-300 ${
+                    isDragOver ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600'
+                  }`} />
+                </div>
+                <div className="space-y-4">
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    Upload Your Image
+                  </h2>
+                  <p className="text-lg text-gray-600">
+                    Transform any image into an "I'm Washed" meme in seconds
+                  </p>
+                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-medium">
+                    <Sparkles className="w-4 h-4" />
+                    Supports JPG, PNG, GIF and more
+                  </div>
+                </div>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </div>
           </div>
-          
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-        </div>
-      )}
+        ) : (
+          <div className="space-y-12">
+            <div className="max-w-2xl mx-auto">
+              <div className="space-y-6">
+                <div className="relative group">
+                  {isProcessing ? (
+                    <div className="bg-white p-4 rounded-2xl shadow-lg">
+                      <div className="w-full h-64 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="relative">
+                            <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 mx-auto mb-6"></div>
+                            <div className="absolute inset-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-indigo-600 mx-auto"></div>
+                          </div>
+                          <p className="text-lg font-medium bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                            Generating your meme...
+                          </p>
+                          <div className="flex justify-center mt-4">
+                            <Sparkles className="w-5 h-5 text-indigo-500 animate-pulse" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : processedImage ? (
+                    <>
+                      <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                      <div className="relative bg-white p-4 rounded-2xl shadow-xl">
+                        <Image
+                          src={processedImage}
+                          alt="I'm washed meme"
+                          width={600}
+                          height={400}
+                          className="w-full h-auto rounded-xl"
+                        />
+                        <div className="absolute top-2 right-2">
+                          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                            washed fr
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4 justify-center pt-8">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
+              >
+                <Upload className="w-5 h-5" />
+                Upload New Image
+              </button>
+              
+              {processedImage && (
+                <>
+                  {isDesktop && (
+                    <button
+                      onClick={copyImage}
+                      disabled={copyStatus === 'copying'}
+                      className={`px-8 py-4 rounded-xl transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3 ${
+                        copyStatus === 'copying' 
+                          ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white cursor-not-allowed'
+                          : copyStatus === 'success'
+                          ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
+                          : copyStatus === 'failed'
+                          ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700'
+                          : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700'
+                      }`}
+                    >
+                      {copyStatus === 'copying' 
+                        ? <Copy className="w-5 h-5 animate-pulse" />
+                        : copyStatus === 'success'
+                        ? <Check className="w-5 h-5" />
+                        : copyStatus === 'failed'
+                        ? <X className="w-5 h-5" />
+                        : <Copy className="w-5 h-5" />
+                      }
+                      {copyStatus === 'copying' 
+                        ? 'Copying...' 
+                        : copyStatus === 'success'
+                        ? 'Copied!'
+                        : copyStatus === 'failed'
+                        ? 'Copy Failed'
+                        : 'Copy Image'
+                      }
+                    </button>
+                  )}
+                  
+                  <button
+                    onClick={downloadImage}
+                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-8 py-4 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
+                  >
+                    <Download className="w-5 h-5" />
+                    Download Image
+                  </button>
+                </>
+              )}
+              
+              <button
+                onClick={clearImages}
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
+              >
+                <X className="w-5 h-5" />
+                Clear All
+              </button>
+            </div>
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 } 
