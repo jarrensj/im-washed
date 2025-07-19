@@ -1,14 +1,25 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 
 export default function ImageUploader() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'success' | 'failed'>('idle');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Check if we're on desktop
+  useEffect(() => {
+    const checkDevice = () => {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      setIsDesktop(!isMobile);
+    };
+    checkDevice();
+  }, []);
 
   const generateWashedImage = useCallback((imageUrl: string) => {
     const img = new window.Image();
@@ -120,13 +131,118 @@ export default function ImageUploader() {
     }
   };
 
-  const downloadImage = () => {
+  const downloadImage = async () => {
     if (!processedImage) return;
     
-    const link = document.createElement('a');
-    link.download = 'im-washed-meme.png';
-    link.href = processedImage;
-    link.click();
+    try {
+      // On mobile, try to share first
+      if (typeof navigator !== 'undefined' && navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        try {
+          const response = await fetch(processedImage);
+          const blob = await response.blob();
+          const file = new File([blob], 'im-washed-meme.png', { type: 'image/png' });
+          await navigator.share({
+            title: "I'm Washed Meme",
+            text: "Check out this I'm washed meme!",
+            files: [file]
+          });
+          return;
+        } catch (shareError) {
+          console.log('Share failed, falling back to download');
+        }
+      }
+      
+      // Desktop download - direct download without trying share first
+      const link = document.createElement('a');
+      link.download = 'im-washed.png';
+      link.href = processedImage;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Final fallback - just open the image in a new tab
+      window.open(processedImage, '_blank');
+    }
+  };
+
+  const copyImage = async () => {
+    if (!processedImage) return;
+    
+    setCopyStatus('copying');
+    
+    try {
+      // Check if clipboard API is supported
+      if (!navigator.clipboard || !navigator.clipboard.write) {
+        console.log('Clipboard API not supported');
+        setCopyStatus('failed');
+        setTimeout(() => setCopyStatus('idle'), 2000);
+        return;
+      }
+
+      // Create a new image element to load the processed image
+      const img = new window.Image();
+      img.crossOrigin = 'anonymous';
+      
+      img.onload = async () => {
+        try {
+          // Create a canvas to convert the image to blob
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            setCopyStatus('failed');
+            setTimeout(() => setCopyStatus('idle'), 2000);
+            return;
+          }
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          // Convert canvas to blob
+          canvas.toBlob(async (blob) => {
+            if (!blob) {
+              setCopyStatus('failed');
+              setTimeout(() => setCopyStatus('idle'), 2000);
+              return;
+            }
+            
+            try {
+              await navigator.clipboard.write([
+                new ClipboardItem({
+                  'image/png': blob
+                })
+              ]);
+              console.log('Image copied to clipboard successfully');
+              setCopyStatus('success');
+              setTimeout(() => setCopyStatus('idle'), 2000);
+            } catch (clipError) {
+              console.error('Clipboard write failed:', clipError);
+              setCopyStatus('failed');
+              setTimeout(() => setCopyStatus('idle'), 2000);
+            }
+          }, 'image/png');
+        } catch (error) {
+          console.error('Image processing for copy failed:', error);
+          setCopyStatus('failed');
+          setTimeout(() => setCopyStatus('idle'), 2000);
+        }
+      };
+
+      img.onerror = () => {
+        console.error('Failed to load image for copying');
+        setCopyStatus('failed');
+        setTimeout(() => setCopyStatus('idle'), 2000);
+      };
+
+      img.src = processedImage;
+      
+    } catch (error) {
+      console.error('Copy failed:', error);
+      setCopyStatus('failed');
+      setTimeout(() => setCopyStatus('idle'), 2000);
+    }
   };
 
   return (
@@ -226,12 +342,38 @@ export default function ImageUploader() {
               Upload New Image
             </button>
             {processedImage && (
-              <button
-                onClick={downloadImage}
-                className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium"
-              >
-                Download Meme
-              </button>
+              <>
+                {isDesktop && (
+                  <button
+                    onClick={copyImage}
+                    disabled={copyStatus === 'copying'}
+                    className={`px-6 py-3 rounded-lg transition-colors font-medium ${
+                      copyStatus === 'copying' 
+                        ? 'bg-gray-400 text-white cursor-not-allowed'
+                        : copyStatus === 'success'
+                        ? 'bg-green-500 text-white hover:bg-green-600'
+                        : copyStatus === 'failed'
+                        ? 'bg-red-500 text-white hover:bg-red-600'
+                        : 'bg-purple-500 text-white hover:bg-purple-600'
+                    }`}
+                  >
+                    {copyStatus === 'copying' 
+                      ? 'Copying...' 
+                      : copyStatus === 'success'
+                      ? 'Copied!'
+                      : copyStatus === 'failed'
+                      ? 'Copy Failed'
+                      : 'Copy Image'
+                    }
+                  </button>
+                )}
+                <button
+                  onClick={downloadImage}
+                  className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium"
+                >
+                  Download Image
+                </button>
+              </>
             )}
             <button
               onClick={clearImages}
