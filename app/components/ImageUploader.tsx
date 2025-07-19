@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
+import { Copy, Download, Check, X, Upload } from 'lucide-react';
 
 export default function ImageUploader() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -258,19 +259,7 @@ export default function ImageUploader() {
         >
           <div className="space-y-6">
             <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                />
-              </svg>
+              <Upload className="w-8 h-8 text-gray-400" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -347,7 +336,7 @@ export default function ImageUploader() {
                   <button
                     onClick={copyImage}
                     disabled={copyStatus === 'copying'}
-                    className={`px-6 py-3 rounded-lg transition-colors font-medium ${
+                    className={`px-6 py-3 rounded-lg transition-colors font-medium flex items-center gap-2 ${
                       copyStatus === 'copying' 
                         ? 'bg-gray-400 text-white cursor-not-allowed'
                         : copyStatus === 'success'
@@ -357,6 +346,14 @@ export default function ImageUploader() {
                         : 'bg-purple-500 text-white hover:bg-purple-600'
                     }`}
                   >
+                    {copyStatus === 'copying' 
+                      ? <Copy className="w-4 h-4 animate-pulse" />
+                      : copyStatus === 'success'
+                      ? <Check className="w-4 h-4" />
+                      : copyStatus === 'failed'
+                      ? <X className="w-4 h-4" />
+                      : <Copy className="w-4 h-4" />
+                    }
                     {copyStatus === 'copying' 
                       ? 'Copying...' 
                       : copyStatus === 'success'
@@ -369,8 +366,9 @@ export default function ImageUploader() {
                 )}
                 <button
                   onClick={downloadImage}
-                  className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium"
+                  className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium flex items-center gap-2"
                 >
+                  <Download className="w-4 h-4" />
                   Download Image
                 </button>
               </>
