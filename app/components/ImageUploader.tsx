@@ -262,7 +262,7 @@ export default function ImageUploader() {
         {!uploadedImage ? (
           <div className="max-w-2xl mx-auto">
             <div
-              className={`relative border-2 border-dashed rounded-2xl p-16 text-center transition-all duration-300 cursor-pointer group ${
+              className={`relative border-2 border-dashed rounded-2xl p-8 sm:p-16 text-center transition-all duration-300 cursor-pointer group ${
                 isDragOver 
                   ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 scale-[1.02] shadow-xl' 
                   : 'border-gray-300 bg-white/50 hover:border-indigo-400 hover:bg-gradient-to-br hover:from-indigo-50 hover:to-purple-50 hover:scale-[1.01] hover:shadow-lg'
@@ -272,31 +272,31 @@ export default function ImageUploader() {
               onDragLeave={handleDragLeave}
               onClick={() => fileInputRef.current?.click()}
             >
-              <div className="space-y-8">
-                <div className="flex justify-center items-center gap-3 mb-6">
-                  <span className="text-4xl">🫧</span>
-                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="space-y-6 sm:space-y-8">
+                <div className="flex justify-center items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <span className="text-3xl sm:text-4xl">🫧</span>
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                     I'm Washed
                   </h1>
-                  <span className="text-4xl">🫧</span>
+                  <span className="text-3xl sm:text-4xl">🫧</span>
                 </div>
-                <div className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  isDragOver 
-                    ? 'bg-gradient-to-br from-indigo-100 to-purple-100 scale-110' 
+                <div className={`mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  isDragOver
+                    ? 'bg-gradient-to-br from-indigo-100 to-purple-100 scale-110'
                     : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-indigo-100 group-hover:to-purple-100 group-hover:scale-110'
                 }`}>
-                  <Upload className={`w-10 h-10 transition-colors duration-300 ${
+                  <Upload className={`w-8 h-8 sm:w-10 sm:h-10 transition-colors duration-300 ${
                     isDragOver ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600'
                   }`} />
                 </div>
-                <div className="space-y-4">
-                  <h2 className="text-3xl font-bold text-gray-900">
+                <div className="space-y-3 sm:space-y-4">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
                     Upload Your Image
                   </h2>
-                  <p className="text-lg text-gray-600">
+                  <p className="text-base sm:text-lg text-gray-600">
                     Transform any image into an "I'm Washed" meme in seconds
                   </p>
-                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-medium">
+                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium">
                     <Sparkles className="w-4 h-4" />
                     Supports JPG, PNG, GIF and more
                   </div>
@@ -312,7 +312,7 @@ export default function ImageUploader() {
             </div>
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             <div className="max-w-2xl mx-auto">
               <div className="space-y-6">
                 <div className="relative group">
@@ -357,10 +357,10 @@ export default function ImageUploader() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap gap-4 justify-center pt-8">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 sm:justify-center pt-4 sm:pt-8">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
+                className="w-full sm:w-auto justify-center bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
               >
                 <Upload className="w-5 h-5" />
                 Upload New Image
@@ -372,7 +372,7 @@ export default function ImageUploader() {
                     <button
                       onClick={copyImage}
                       disabled={copyStatus === 'copying'}
-                      className={`px-8 py-4 rounded-xl transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3 ${
+                      className={`w-full sm:w-auto justify-center px-6 sm:px-8 py-3 sm:py-4 rounded-xl transition-all duration-300 font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3 ${
                         copyStatus === 'copying' 
                           ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white cursor-not-allowed'
                           : copyStatus === 'success'
@@ -403,7 +403,7 @@ export default function ImageUploader() {
                   
                   <button
                     onClick={downloadImage}
-                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-8 py-4 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
+                    className="w-full sm:w-auto justify-center bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
                   >
                     <Download className="w-5 h-5" />
                     Download Image
@@ -413,7 +413,7 @@ export default function ImageUploader() {
               
               <button
                 onClick={clearImages}
-                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
+                className="w-full sm:w-auto justify-center bg-gradient-to-r from-red-500 to-red-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
               >
                 <X className="w-5 h-5" />
                 Clear All
