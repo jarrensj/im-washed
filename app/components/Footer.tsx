@@ -5,7 +5,7 @@ export default function Footer() {
         href="https://github.com/jarrensj/im-washed"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:text-gray-900 transition-colors"
+        className="hover:text-blue-600 hover:underline transition-colors"
       >
         link to github repo
       </a>
