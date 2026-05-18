@@ -255,7 +255,7 @@ export default function ImageUploader() {
   };
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div>
       <div className="w-full max-w-6xl mx-auto">
         <canvas ref={canvasRef} className="hidden" />
         
