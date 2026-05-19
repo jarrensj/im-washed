@@ -289,17 +289,13 @@ export default function ImageUploader() {
                     isDragOver ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600'
                   }`} />
                 </div>
-                <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-2 sm:space-y-3">
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                    Upload Your Image
+                    Drop a photo or click to upload
                   </h2>
                   <p className="text-base sm:text-lg text-gray-600">
-                    Transform any image into an "I'm Washed" meme in seconds
+                    Turn any image into an "I'm Washed" meme in seconds
                   </p>
-                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium">
-                    <Sparkles className="w-4 h-4" />
-                    Supports JPG, PNG, GIF and more
-                  </div>
                 </div>
               </div>
               <input
