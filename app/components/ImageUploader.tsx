@@ -397,13 +397,15 @@ export default function ImageUploader() {
                     </button>
                   )}
                   
-                  <button
-                    onClick={downloadImage}
-                    className="w-full sm:w-auto justify-center bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
-                  >
-                    <Download className="w-5 h-5" />
-                    Download Image
-                  </button>
+                  {isDesktop && (
+                    <button
+                      onClick={downloadImage}
+                      className="w-full sm:w-auto justify-center bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-3"
+                    >
+                      <Download className="w-5 h-5" />
+                      Download Image
+                    </button>
+                  )}
                 </>
               )}
               
