@@ -349,6 +349,11 @@ export default function ImageUploader() {
                     </>
                   ) : null}
                 </div>
+                {!isDesktop && processedImage && !isProcessing && (
+                  <p className="text-center text-xs text-gray-500">
+                    Long-press the image to save or share
+                  </p>
+                )}
               </div>
             </div>
 
